@@ -27,7 +27,7 @@
             <div class="flex-grow-1 bg-light rounded-2 p-2 me-1 w-50">
                 <h3>Todos</h3>
                 <div id="todo-list">
-                    <div class="task bg-light p-1 rounded-2 ps-2">Project</div>
+
                 </div>
             </div>
             <div class="flex-grow-1 bg-light rounded-2 p-2 w-50">
@@ -42,24 +42,66 @@
     <script>
         let button = document.querySelector("#add");
 
+        const todos = [];
+
+        function addTodo(todo){
+            todos = [...todos, todo]
+            render(todo);
+        }
+
+        function removeTodo(todo) {
+            todos = todos.filter((t) => t !== todo);
+            render(todo);
+        }
+
+        function doneTodo(todo) {
+            todo.isDone = true;
+            render(todo);
+        }
+
+        function render(todo) {
+            const todolist = document.querySelector("#todo-list");
+            const doneList = document.querySelector("#done-list");
+
+            for (const todo of todos) {
+                const list = todo.isDone ? doneList : todolist;
+                const newTodo = document.createElement("div");
+                newTodo.classList.add("task", "bg-light", "p-1", "rounded-2", "ps-2", "d-flex", "align-items-center");
+                newTodo.innerHTML = `<span class="me-auto">${todo.task}</span>`
+
+                if (!todo.isDone) {
+                    const checkbtn = document.createElement("button");
+                    checkbtn.classList.add("btn", "btn-sm", "btn-success", "me-1");
+                    checkbtn.addEventListener("click", () => {
+                        newTodo.remove();
+                        doneTodo();
+                        render();
+                    })
+                    newTodo.appendChild(checkbtn);
+                }
+
+                const delbtn = document.createElement("button");
+                delbtn.classList.add("btn", "btn-sm", "btn-danger");
+                delbtn.innerHTML = `<i class="bi bi-x"></i>`;
+                delbtn.addEventListener("click", () => {
+                    newTodo.remove();
+                    removeTodo();
+                    render();
+                })
+                newTodo.appendChild(delbtn);
+            }
+        }
+
         button.addEventListener("click", () => {
-            // 1. Read the text in #task-input
-            let input = document.querySelector("#task-input");
-            let task = input.value;
-            
-            if (!task.length) return;
-
-            // 2. Append the text to #todo-list
-            let newTask = document.createElement("div");
-            newTask.classList.add("task", "bg-light", "p-1", "rounded-2", "ps-2");
-            newTask.innerText = task;
-
-            let todoList = document.querySelector("#todo-list");
-            todoList.appendChild(newTask);
-
-            // 3. Clear the text in #task-input
+            const input = document.querySelector("#task-input");
+            const task = input.value;
             input.value = "";
-        });
+            addTodolist({
+                task: task,
+                isDone: false
+            });
+        })
+
     </script>
   </body>
 </html>
